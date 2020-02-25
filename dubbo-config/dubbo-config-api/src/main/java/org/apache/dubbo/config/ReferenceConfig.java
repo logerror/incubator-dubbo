@@ -150,9 +150,11 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
     }
 
     public synchronized T get() {
+        //若已经销毁，则抛出异常
         if (destroyed) {
             throw new IllegalStateException("The invoker of ReferenceConfig(" + url + ") has already destroyed!");
         }
+        //没有初始化，则初始化
         if (ref == null) {
             init();
         }
@@ -168,6 +170,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
         }
         destroyed = true;
         try {
+            //标记为不可用
             invoker.destroy();
         } catch (Throwable t) {
             logger.warn("Unexpected error occured when destroy invoker of ReferenceConfig(" + url + ").", t);
@@ -365,6 +368,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
      * Check each config modules are created properly and override their properties if necessary.
      */
     public void checkAndUpdateSubConfigs() {
+        // service interface名称不能为空
         if (StringUtils.isEmpty(interfaceName)) {
             throw new IllegalStateException("<dubbo:reference interface=\"\" /> interface not allow null!");
         }
